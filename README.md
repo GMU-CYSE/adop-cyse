@@ -79,8 +79,8 @@ for exactly what is and is not modeled.
                     (each team's own project)
 ```
 
-This intentionally mirrors Figure 2 / Figure 3 / Figure 4 of the project
-notebook: the agent host at the center, four MCP reference servers around
+This intentionally mirrors Figure 2, Figure 3, and Figure 4 of the **project
+notebook** (check course content in Canvas course): the agent host at the center, four MCP reference servers around
 it (each a capability *and* an attack surface), an Observability and Audit
 Layer recording every call, and a downstream artifact (the frozen corpus)
 that is the *only* interface a team's tool is allowed to reason from.
@@ -95,7 +95,7 @@ misinterpreting retrieved content as instructions (see `task-04` in
 
 ## What this testbed does and does not include
 
-Per Section D.8's scope note, this testbed implements the leaner
+Per Section D.8's scope note in the **project notebook**, this testbed implements the leaner
 "Agent execution + tool servers + audit" slice of the full IDP-to-ADOP
 stack, not Backstage/Kratix:
 
