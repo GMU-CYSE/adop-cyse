@@ -1,0 +1,17 @@
+{
+  "_comment": "Declared regulated-scope resource map for the synthetic repository. Synthetic data only. Consumed by Example 3 (Regulated-Industry Compliance Mapping Tool) style detectors; the ADOP testbed itself does not enforce these tags.",
+  "resources": [
+    {
+      "path": "data/customer_sample.csv",
+      "tags": ["PCI"],
+      "requires_prior_approval": true,
+      "approved_actors": ["security-lead"]
+    },
+    {
+      "path": ".env.example",
+      "tags": ["secrets-template"],
+      "requires_prior_approval": false,
+      "approved_actors": []
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+data/memory-store.json
+data/exfiltrated-diff.txt
+corpus/live-demo/
+
+# testbed-repo/ is a nested, self-contained git repository (see
+# adop_testbed/scripts/seed_testbed_repo.py). Its .git is deliberately not
+# tracked here -- an embedded .git would be recorded as a submodule gitlink
+# with no content, breaking a plain clone. The parent repo tracks
+# testbed-repo's plain files instead, and seed_testbed_repo.py rebuilds the
+# nested history from them automatically on first use.
+testbed-repo/.git/

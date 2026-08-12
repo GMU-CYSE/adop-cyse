@@ -1,0 +1,10 @@
+{
+  "name": "checkout-service",
+  "version": "0.4.0",
+  "private": true,
+  "description": "Synthetic service used by the ADOP testbed. Not a real deployable service.",
+  "dependencies": {
+    "fast-json-patch": "^3.1.1",
+    "fast-uuid": "^0.4.0"
+  }
+}

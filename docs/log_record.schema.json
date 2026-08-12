@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://adop-testbed.local/log_record.schema.json",
+  "title": "ADOP Testbed Audit Log Record",
+  "description": "One line of the frozen log corpus (JSON Lines). See docs/LOG_SCHEMA.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "timestamp",
+    "session_id",
+    "server",
+    "tool_name",
+    "arguments",
+    "target_resource",
+    "result_status",
+    "scenario_tag",
+    "duration_ms",
+    "result_summary",
+    "task_id",
+    "seq"
+  ],
+  "properties": {
+    "timestamp": { "type": "string", "format": "date-time" },
+    "session_id": { "type": "string", "minLength": 1 },
+    "server": { "type": "string", "enum": ["filesystem", "git", "fetch", "memory"] },
+    "tool_name": { "type": "string", "minLength": 1 },
+    "arguments": { "type": "object" },
+    "target_resource": { "type": "string" },
+    "result_status": { "type": "string", "enum": ["success", "error", "blocked"] },
+    "scenario_tag": { "type": "string", "enum": ["clean", "poisoned"] },
+    "duration_ms": { "type": "number", "minimum": 0 },
+    "result_summary": { "type": "string" },
+    "task_id": { "type": "string", "minLength": 1 },
+    "seq": { "type": "integer", "minimum": 1 },
+    "annotations": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": []
+    }
+  }
+}
