@@ -37,9 +37,21 @@ async def test_full_task_set_runs_end_to_end(tmp_path):
     assert all(r["scenario_tag"] == "poisoned" for r in poisoned_records)
     assert all(r["result_status"] == "success" for r in clean_records + poisoned_records)
 
-    # The injection chain in task-04 must have actually fired.
-    injected = [r for r in poisoned_records if "indirect_prompt_injection" in r.get("annotations", [])]
-    assert len(injected) == 2  # the git_diff call and the memory_set call
+    # The injection chain in task-04 must have actually fired: the scripted
+    # plan always follows poisoned-readme.md's embedded instructions, so the
+    # generic annotator should catch both the trigger (the fetch) and the
+    # argument-injection call it leads to, and propagate post_injection_context
+    # to every later call in that same task.
+    fetch_records = [r for r in poisoned_records if r["tool_name"] == "fetch"]
+    assert any("untrusted_content_source" in r["annotations"] for r in fetch_records)
+
+    diff_records = [r for r in poisoned_records if r["tool_name"] == "git_diff"]
+    assert any(
+        "argument_injection" in r["annotations"] and "cve-2025-68144" in r["annotations"] for r in diff_records
+    )
+
+    post_injection = [r for r in poisoned_records if "post_injection_context" in r.get("annotations", [])]
+    assert len(post_injection) >= 3  # every call in task-04 after the poisoned fetch
 
     # seq is monotonic and shared across both files for one session_id.
     all_seq = sorted(r["seq"] for r in clean_records + poisoned_records)

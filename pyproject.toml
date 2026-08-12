@@ -1,12 +1,13 @@
 [project]
 name = "adop-testbed"
 version = "1.0.0"
-description = "CYSE-587/SYST-687 - Frozen ADOP (Agentic Development and Operations Platform) MVP testbed: pinned MCP reference servers, synthetic repository, fixed task set, observability/audit layer, and frozen log corpus."
+description = "CYSE-587/SYST-687 - ADOP (Agentic Development and Operations Platform) MVP testbed: pinned MCP reference servers, synthetic repository, fixed task set, observability/audit layer, and an Ollama-backed live agent host."
 requires-python = ">=3.11"
 dependencies = [
   "mcp>=1.9.0",
   "pydantic>=2.7",
   "anyio>=4.4",
+  "ollama>=0.4.0",
 ]
 
 [project.optional-dependencies]
@@ -19,6 +20,9 @@ dev = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
+markers = [
+  "live_llm: requires a real, locally-running Ollama instance with the configured model pulled",
+]
 
 [build-system]
 requires = ["setuptools>=68"]

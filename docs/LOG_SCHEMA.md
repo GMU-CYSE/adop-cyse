@@ -1,26 +1,27 @@
 # Log Schema Reference (Section G.2 Data Contract)
 
-All telemetry the testbed produces -- the frozen corpus and any Live-mode
-demo session -- is delivered as **JSON Lines** (one JSON object per line,
-UTF-8, `\n`-terminated). Every canonical example and non-example in
-Section F of the project notebook assumes this schema as its only data
-source; a Student-Developed Agent Trust and Assurance Tool should never
-need to reach outside it.
+All telemetry this testbed produces -- both your own Live-mode sessions and
+the small reference corpus -- is delivered as **JSON Lines** (one JSON
+object per line, UTF-8, `\n`-terminated). Every canonical example and
+non-example in Section F of the project notebook assumes this schema as
+its only data source; your Trust and Assurance Tool should never need to
+reach outside it.
 
 ## File layout
 
 ```
 corpus/
   clean/
-    session-01.jsonl       # records where scenario_tag == "clean"
+    session-01.jsonl                  # reference corpus (scripted host), scenario_tag == "clean"
   poisoned/
-    session-01.jsonl       # records where scenario_tag == "poisoned"
-  live-demo/
-    live-<8 hex chars>.jsonl   # optional, Live mode only, not graded
+    session-01.jsonl                  # reference corpus (scripted host), scenario_tag == "poisoned"
+  live-session-<date>-<id>/
+    clean.jsonl                       # your own live session, scenario_tag == "clean"
+    poisoned.jsonl                    # your own live session, scenario_tag == "poisoned"
 ```
 
-A single agent-host run (one `session_id`) can produce records in *both*
-`corpus/clean/` and `corpus/poisoned/`, split by each record's
+A single agent-host run (one `session_id`) produces records in *both* the
+`clean` and `poisoned` files for that run, split by each record's
 `scenario_tag` -- a realistic session mixes routine and adversarial tasks.
 Join across the two files on `session_id` to reconstruct a full session in
 order (`seq` is monotonically increasing per `session_id` across both
@@ -42,7 +43,7 @@ files).
 | `result_summary`   | string                            | First 200 characters of the tool's text output, newlines collapsed. Truncation is intentional -- full content, when needed, is re-derivable from `arguments` plus a Static-mode read of the synthetic repository. |
 | `task_id`          | string                            | Task identifier from `adop_testbed/host/tasks/synthetic_tasks.json`. |
 | `seq`              | integer                           | 1-indexed position of this call within its `session_id`, across both the clean and poisoned files. |
-| `annotations`      | string array (optional, may be empty) | **Not part of the graded data contract.** Teaching ground-truth tags (e.g. `"path_traversal"`, `"argument_injection"`, `"indirect_prompt_injection"`, `"cve-2025-68144"`, `"excessive_agency"`, `"unvetted_dependency_source"`) marking which known weakness class, if any, a call exercised. Provided so teams can validate a detector's precision/recall against ground truth during development; a real deployment would not have this field, so detectors should not treat its absence or presence as a feature. |
+| `annotations`      | string array (optional, may be empty) | **Not part of a real deployment's data contract; a debugging aid only.** Computed generically, after the fact, by `adop_testbed/host/annotate.py` from a call's own arguments and result text (e.g. `"path_traversal"`, `"argument_injection"`, `"cve-2025-68144"`, `"untrusted_content_source"`, `"unvetted_dependency_source"`, `"post_injection_context"`) -- the same logic runs whether the call came from the scripted reference host or your own live LLM session, so it's not tied to a fixed script knowing in advance what will happen. Useful to validate your own detector's precision/recall while building it; a production tool would not have this field and should not rely on its presence. |
 
 ## Example record (poisoned, argument-injection chain)
 

@@ -64,4 +64,5 @@ def test_poisoned_corpus_contains_cve_annotations():
         for line in path.read_text(encoding="utf-8").splitlines():
             annotations_seen.update(json.loads(line).get("annotations", []))
     assert "cve-2025-68144" in annotations_seen
-    assert "indirect_prompt_injection" in annotations_seen
+    assert "untrusted_content_source" in annotations_seen
+    assert "post_injection_context" in annotations_seen

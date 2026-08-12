@@ -1,84 +1,70 @@
 #!/usr/bin/env python3
-"""Live mode (Section G.2): an optional, READ-ONLY harness for the final PoC
-demo. It runs the agent host against the live, pinned reference servers to
-produce a fresh demo session, without ever writing back into the frozen
-baseline.
+"""Live mode: the primary, student-facing way to run this testbed.
 
-This is enforced two ways:
-  1. Only the read-only subset of tools is permitted (see READ_ONLY_TOOLS
-     below) -- any task plan that calls a write/commit/init tool is refused.
-  2. The testbed is reset to baseline again immediately afterwards, so a
-     live-mode run can never leave residue for the next team or the next
-     grading pass.
+This is infrastructure, not a graded assignment (see README.md) -- each
+team runs it in their own local environment. It resets testbed-repo/ to
+baseline, then drives the full fixed synthetic task set (all six tasks,
+clean and poisoned) through a real, locally-run LLM (via Ollama) deciding
+for itself which tools to call, against the four pinned MCP servers. Every
+call is captured by the Observability and Audit Layer exactly as in the
+reference corpus, split into corpus/live-session-<id>/clean.jsonl and
+.../poisoned.jsonl.
 
-Live mode does NOT replace the static corpus for grading (G.2); it exists
-solely so a team's own Student-Developed Agent Trust and Assurance Tool can
-be pointed at a live session during the final demo.
+Requires Ollama running locally with a tool-calling-capable model pulled.
+See README.md "Requirements".
 
-Run with: python -m adop_testbed.scripts.live_mode
+Run with: python -m adop_testbed.scripts.live_mode [--model MODEL_NAME]
 """
 
 from __future__ import annotations
 
+import argparse
 import asyncio
+import datetime
 import uuid
 
-from adop_testbed.audit.logger import AuditLogger
-from adop_testbed.host.agent_host import AgentHost, load_tasks
+from adop_testbed.audit.logger import AuditLogger, SessionSequencer
+from adop_testbed.host.agent_host import load_tasks
+from adop_testbed.host.llm_agent_host import DEFAULT_MODEL, OllamaLiveAgentHost
 from adop_testbed.sandbox import PROJECT_ROOT
 from adop_testbed.scripts.reset_testbed import reset_testbed
 
-# Tools that never mutate the frozen synthetic-repository baseline. Memory
-# writes are permitted: the cross-session store is not part of ADOP's core
-# baseline (G.1's pinned servers, synthetic repository, and task set), so
-# recording notes there during a live demo leaves no residue that would
-# affect another team's static-mode grading run.
-ALLOWED_IN_LIVE_MODE = {
-    "filesystem": {"read_text_file", "list_directory", "search_files", "get_file_info"},
-    "git": {"git_status", "git_log", "git_branch", "git_show_worktree", "git_diff"},
-    "fetch": {"fetch", "list_available_pages"},
-    "memory": {"memory_get", "memory_list", "memory_set"},
-}
 
-# Only tasks whose scripted plan stays within ALLOWED_IN_LIVE_MODE are
-# meaningful in live mode. task-02 and task-05 draft patches and commit;
-# task-04 and task-06 deliberately reproduce the CVEs via a write/init --
-# all four are Static-mode-only by design.
-LIVE_MODE_TASK_IDS = {"task-01-triage-issue-142", "task-03-summarize-vendor-readme"}
+async def run_live_session(model: str | None = None) -> None:
+    reset_testbed()
 
+    session_id = f"live-{datetime.date.today().isoformat()}-{uuid.uuid4().hex[:6]}"
+    session_dir = PROJECT_ROOT / "corpus" / f"live-session-{session_id}"
+    sequencer = SessionSequencer()
+    clean_logger = AuditLogger(session_dir / "clean.jsonl", session_id=session_id, sequencer=sequencer)
+    poisoned_logger = AuditLogger(session_dir / "poisoned.jsonl", session_id=session_id, sequencer=sequencer)
+    await clean_logger.init()
+    await poisoned_logger.init()
 
-class LiveModeViolation(Exception):
-    """Raised when a task plan would perform a write against the live baseline."""
+    tasks = load_tasks()
+    async with OllamaLiveAgentHost({"clean": clean_logger, "poisoned": poisoned_logger}, model=model) as host:
+        print(f"Live session {session_id} -- model: {host.model}\n")
+        for task in tasks:
+            print(f"--- {task.id} ({task.scenario_tag}): {task.title} ---")
+            summary = await host.run_task_live(task)
+            print(summary.strip() or "(no summary text returned)")
+            print()
 
-
-class ReadOnlyAgentHost(AgentHost):
-    async def call(self, task, server, tool_name, arguments, *, target_resource, annotations=None):  # type: ignore[override]
-        if tool_name not in ALLOWED_IN_LIVE_MODE.get(server, set()):
-            raise LiveModeViolation(
-                f"Live mode may not mutate ADOP's core; refusing to call {server}.{tool_name} "
-                f"(task {task.id}). Use Static mode for tasks that write, commit, or "
-                f"initialize repositories."
-            )
-        return await super().call(task, server, tool_name, arguments, target_resource=target_resource, annotations=annotations)
+    print(f"Wrote {clean_logger.out_file.relative_to(PROJECT_ROOT)} ({clean_logger.count} records)")
+    print(f"Wrote {poisoned_logger.out_file.relative_to(PROJECT_ROOT)} ({poisoned_logger.count} records)")
+    print(
+        "\ntestbed-repo/ was left as the model modified it -- run "
+        "`python -m adop_testbed.scripts.reset_testbed` before your next live session "
+        "if you want a clean baseline again."
+    )
 
 
-async def main() -> None:
-    session_id = f"live-{uuid.uuid4().hex[:8]}"
-    out_file = PROJECT_ROOT / "corpus" / "live-demo" / f"{session_id}.jsonl"
-    logger = AuditLogger(out_file, session_id=session_id)
-    await logger.init()
-
-    tasks = [t for t in load_tasks() if t.id in LIVE_MODE_TASK_IDS]
-
-    try:
-        async with ReadOnlyAgentHost({"clean": logger, "poisoned": logger}) as host:
-            await host.run(tasks)
-    finally:
-        reset_testbed()
-
-    print(f"Live-mode demo session written to {out_file.relative_to(PROJECT_ROOT)} ({logger.count} records).")
-    print("Testbed reset back to baseline; no residue left for other teams.")
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--model", default=None, help=f"Ollama model to use (default: ${{ADOP_OLLAMA_MODEL}} or {DEFAULT_MODEL!r})")
+    args = parser.parse_args()
+    asyncio.run(run_live_session(model=args.model))
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
