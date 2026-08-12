@@ -11,10 +11,9 @@ corpus.
 Two of the reference servers (Git and, in one relevant scenario, the agent
 host's own instruction handling) intentionally reproduce the weakness
 classes behind two disclosed CVEs referenced throughout the notebook
-(CVE-2025-68143, CVE-2025-68144), so the corpus contains real, reproducible
+([CVE-2025-68143](https://www.cve.org/CVERecord?id=CVE-2025-68143), [CVE-2025-68144](https://www.cve.org/CVERecord?id=CVE-2025-68144)), so the corpus contains real, reproducible
 ground truth for a Student-Developed Agent Trust and Assurance Tool to
-detect -- without students ever needing to patch the platform itself
-(Section F, G.3: that is explicitly out of scope).
+detect -- without students ever needing to patch the platform itself.
 
 Everything here is **synthetic**. There is no real internet access, no real
 secrets, and no real customer data; see [Trust Assumptions](docs/TRUST_ASSUMPTIONS.md)
