@@ -464,7 +464,7 @@ Keep this evidence together (a shared folder or your OnAir Hub draft works well)
 
 ---
 
-## 16. Reflection rubric: entrepreneurial mindset (EML)
+## 16. Reflection rubric
 
 The written reflection from §15, item 9, is graded out of **100 points** against the three criteria below: **Curiosity**, **Value**, and **Connections**. These are the same 3Cs used elsewhere in the course's entrepreneurial-mindset material (KEEN framework) — this rubric adapts them specifically to what you did in this lab, not to your final Trust and Assurance Tool, which is graded separately at each Deliverable.
 
