@@ -4,7 +4,7 @@ version = "1.0.0"
 description = "CYSE-587/SYST-687 - ADOP (Agentic Development and Operations Platform) MVP testbed: pinned MCP reference servers, synthetic repository, fixed task set, observability/audit layer, and an Ollama-backed live agent host."
 requires-python = ">=3.11"
 dependencies = [
-  "mcp>=1.9.0",
+  "mcp>=2.0.0",
   "pydantic>=2.7",
   "anyio>=4.4",
   "ollama>=0.4.0",

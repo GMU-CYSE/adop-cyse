@@ -130,6 +130,14 @@ Backstage/Kratix (full conceptual background: Guided Lab, Section 2):
 ## Requirements
 
 - Python 3.11+ and `git` on `PATH`.
+- A **dedicated virtual environment** for this project. This testbed pins
+  `mcp>=2.0.0` (its servers use the `mcp.server.mcpserver.MCPServer` API,
+  only present from that version on); installing into a shared environment
+  that already has an older `mcp` pinned by something else (e.g. `semgrep`
+  pins `mcp==1.23.3`) will silently downgrade it, and every MCP server will
+  fail to start with a cryptic `Connection closed` / `McpError` from every
+  test and from `live_mode`. Don't install this into your base conda/system
+  environment if you use tools like that.
 - [Ollama](https://ollama.com/download), running locally (`ollama serve`,
   or launch the desktop app), with a **tool-calling-capable** model
   pulled. Not every model supports Ollama's tool-calling API well:
@@ -147,9 +155,23 @@ Backstage/Kratix (full conceptual background: Guided Lab, Section 2):
 ```
 git clone <this repo>          # or unzip the distributed archive
 cd adop_2026
+python -m venv .venv
+.venv\Scripts\activate         # Windows; use `source .venv/bin/activate` on macOS/Linux
 pip install -e ".[dev]"
 python -m adop_testbed.scripts.onboarding_check
 ```
+
+Activate `.venv` in every new shell before running any `adop_testbed`
+script, `pytest`, or `live_mode`.
+
+**Troubleshooting:** if `pytest` or `live_mode` fails with
+`mcp.shared.exceptions.McpError: Connection closed` and the server's
+stderr shows `ModuleNotFoundError: No module named 'mcp.server.mcpserver'`,
+your environment has an `mcp` version older than 2.0.0 shadowing the
+pinned one -- almost always because you installed into a shared
+environment (e.g. Anaconda `base`) that another tool downgraded. Fix:
+create a fresh `.venv` as above and reinstall there; don't install this
+project's dependencies into a shared/base environment.
 
 `testbed-repo/` needs to be a real, self-contained git repository (its own
 `.git`, commit history, and a `baseline` tag) for the Git MCP server to
