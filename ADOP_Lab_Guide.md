@@ -6,7 +6,7 @@ Repository: <https://github.com/GMU-CYSE/adop-cyse>
 
 This is a step-by-step, hands-on companion to the **Project Notebook**. The Notebook is where IDP, Backstage, Kratix, MCP, the ADOP autonomy spectrum, and the six canonical project examples are taught in full, with worked diagrams (Sections D and F). This guide assumes you have already read that material and does not re-teach it. What this guide does instead is walk you through *this specific repository*: what each file is for, how to install and run it, how to author your own scenarios, and how to prove — to yourself and to your instructor — that you actually understand what it produces.
 
-> **Before you start.** This testbed is not graded. It exists so every team has the same working infrastructure. What counts toward your grade is the external Student-Developed Agent Trust and Assurance Tool your team builds by consuming the logs this environment produces (see the Notebook, Section F), not how well you operated the testbed itself. The checklist at the end of this guide (§15) is a **suggested proof-of-work exercise** — use it to confirm your team is actually ready to start building. The one exception is the written **reflection** it produces (§15, item 9): that piece is submitted with Deliverable 1 and graded out of 100 points against the entrepreneurial-mindset rubric in §16.
+> **Before you start.** This testbed is not graded. It exists so every team has the same working infrastructure. What counts toward your grade is the external Student-Developed Agent Trust and Assurance Tool your team builds by consuming the logs this environment produces (see the Notebook, Section F), not how well you operated the testbed itself. The checklist at the end of this guide (§15) is a **suggested proof-of-work exercise** — use it to confirm you're actually ready to start building. The one exception is the written **reflection** it produces (§15, item 9): that piece is submitted as Week 1 homework, individually, and graded out of 100 points against the rubric in §16.
 
 ## Contents
 
@@ -25,7 +25,7 @@ This is a step-by-step, hands-on companion to the **Project Notebook**. The Note
 13. [The two intentional vulnerabilities, in detail](#13-the-two-intentional-vulnerabilities-in-detail)
 14. [Case study: the full chain in task-04](#14-case-study-the-full-chain-in-task-04)
 15. [Proof of work: the lab completion checklist](#15-proof-of-work-the-lab-completion-checklist)
-16. [Reflection rubric: entrepreneurial mindset (EML)](#16-reflection-rubric-entrepreneurial-mindset-eml)
+16. [Reflection rubric](#16-reflection-rubric)
 17. [Troubleshooting](#17-troubleshooting)
 
 ---
@@ -446,7 +446,7 @@ The chain: a `fetch` of untrusted content → (if the model complies with the hi
 
 ## 15. Proof of work: the lab completion checklist
 
-This checklist is a suggested way for your team to confirm — with concrete, easily-checkable artifacts — that you have actually run the system end to end before you start designing your tool. Items 1–8 are a self-check, not individually graded, but Deliverable 1 assumes your team has done them. Item 9, the written reflection, **is** a graded submission — see §16.
+This checklist is a suggested way to confirm — with concrete, easily-checkable artifacts — that you have actually run the system end to end before you start designing your tool. Like the rest of the ADOP Guided Lab, each student works through it individually. Items 1–8 are a self-check, not graded item by item; Deliverable 1 in Week 7 assumes you already did them, since they are due as **Week 1 homework**. Item 9, the written reflection, **is** graded, also due with Week 1 homework — see §16.
 
 | # | Task | Run | Evidence to keep |
 |---|---|---|---|
@@ -458,7 +458,7 @@ This checklist is a suggested way for your team to confirm — with concrete, ea
 | 6 | Live mode, exploitation evidence | Inspect the `poisoned.jsonl` from at least one of your three sessions | The `fetch` → (`git_diff` or `memory_set`) record sequence for `task-04`, or a note that the model did *not* fall for it in that particular run (both outcomes are valid evidence — non-determinism is the point). |
 | 7 | Manual CVE identification | By eye, before writing any detection code | For one record you found in step 6, a one-sentence note identifying which CVE/weakness class it matches and why, without relying on the `annotations` field to do the thinking for you. |
 | 8 | Free-text prompting exercise (§11) | At least two of the prompt ideas in §11.3, run through Option A or Option B | For each prompt: the exact text you wrote, the resulting tool-call sequence, and one sentence on how it differed from the fixed-task behavior you'd already seen. |
-| 9 | **Reflection** — graded, see §16 | — | A short written reflection (submitted with Deliverable 1) connecting what you observed across steps 1–8 to the autonomy-spectrum question in Notebook §D.5, to the Canonical Example (Notebook §F.1) your team is leaning toward, and to what the free-text exercise in §11 changed about your confidence in the agent's behavior. Graded out of 100 points against the rubric in §16. |
+| 9 | **Reflection** — graded, see §16 | — | A short written reflection (individual, submitted with Week 1 homework) connecting what you observed across steps 1–8 to the autonomy-spectrum question in Notebook §D.5, to the Canonical Example (Notebook §F.1) your team is leaning toward, and to what the free-text exercise in §11 changed about your confidence in the agent's behavior. Graded out of 100 points against the rubric in §16. |
 
 Keep this evidence together (a shared folder or your OnAir Hub draft works well) — it is the fastest way to show a Shark, later, that your tool's claims are grounded in something you actually observed rather than assumed.
 
@@ -466,7 +466,7 @@ Keep this evidence together (a shared folder or your OnAir Hub draft works well)
 
 ## 16. Reflection rubric
 
-The written reflection from §15, item 9, is graded out of **100 points** against the three criteria below: **Curiosity**, **Value**, and **Connections**. These are the same 3Cs used elsewhere in the course's entrepreneurial-mindset material (KEEN framework) — this rubric adapts them specifically to what you did in this lab, not to your final Trust and Assurance Tool, which is graded separately at each Deliverable.
+The written reflection from §15, item 9, is graded out of **100 points** against three criteria: **Curiosity**, **Value**, and **Connections**. This rubric evaluates what you did in this lab specifically — it is separate from your final Trust and Assurance Tool, which is graded through the Shark rubric at each Deliverable.
 
 A strong reflection is short (half a page to a page is plenty) and specific. It names an actual prompt you wrote, an actual record you found, or an actual moment where the agent surprised you — not a restatement of what this guide already told you to expect.
 
