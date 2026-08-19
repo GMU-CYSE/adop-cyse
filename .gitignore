@@ -5,6 +5,7 @@ __pycache__/
 data/memory-store.json
 data/exfiltrated-diff.txt
 corpus/live-session-*/
+corpus/interactive-session-*/
 
 # testbed-repo/ is a nested, self-contained git repository (see
 # adop_testbed/scripts/seed_testbed_repo.py). Its .git is deliberately not

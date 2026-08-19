@@ -207,6 +207,34 @@ corpus/live-session-<date>-<id>/clean.jsonl
 corpus/live-session-<date>-<id>/poisoned.jsonl
 ```
 
+### Run an interactive session (for live demos)
+
+```
+python -m adop_testbed.scripts.interactive_mode
+# or, to pick a specific local model:
+python -m adop_testbed.scripts.interactive_mode --model llama3.1:8b
+```
+
+A CLI for demoing ADOP live (e.g. a Shark Tank-style presentation): type any
+free-text instruction and watch your local model decide, in real time,
+which tools to call against the same real, pinned MCP servers `live_mode`
+uses. Type `:poisoned` before an instruction to tag it as scenario
+"poisoned" in the log (default is "clean"); `:help` for other commands,
+`:quit` (or Ctrl-D) to end the session.
+
+**This is a demo aid, not the graded benchmark.** Ad hoc instructions typed
+here have no fixed ground truth to validate a detector against -- use
+`live_mode` / `generate_corpus` for that. It builds entirely on the same
+pinned `OllamaLiveAgentHost` and MCP servers Live mode uses (see
+`adop_testbed/scripts/interactive_mode.py`); no server or agent-host code
+was added or changed to support it, so everything under "What you may not
+do" still holds. Every call is still logged, to:
+
+```
+corpus/interactive-session-<date>-<id>/clean.jsonl
+corpus/interactive-session-<date>-<id>/poisoned.jsonl
+```
+
 **Non-deterministic by design.** A different model, or the same model on
 a different run, may or may not fetch the poisoned mirror README in
 `task-04`, may or may not fall for the injected instructions inside it,
@@ -347,18 +375,24 @@ not as a step-by-step recipe:
 ## The reference log corpus
 
 `corpus/clean/session-01.jsonl` and `corpus/poisoned/session-01.jsonl` are
-produced by the scripted host (`generate_corpus`), not a live session.
-Reference material, not the dataset your tool is graded against (nothing
-here is graded):
+produced by the scripted host (`generate_corpus`), not a live session. This
+is the frozen corpus described as Static mode in the Project Notebook
+(G.1/G.2): a fixed, deterministic dataset every team receives identically,
+useful for:
 
 - A worked example of the JSON Lines schema (full reference:
   [docs/LOG_SCHEMA.md](docs/LOG_SCHEMA.md) /
   [docs/log_record.schema.json](docs/log_record.schema.json)).
-- Something to unit-test your detector's parsing and scoring logic against
-  before you have installed Ollama or pulled a model.
+- Unit-testing your detector's parsing and scoring logic before you have
+  installed Ollama or pulled a model.
 - A known-good example of each CVE's telemetry signature.
 
-Your tool's actual proving ground is your own `live_mode` sessions.
+Your own `live_mode` sessions are the other data source: a live, real model
+making its own decisions each run, so the same instruction can produce
+different tool-call sequences from one session to the next. Your detector
+should be exercised against both -- the frozen corpus for a fixed baseline,
+your own `live_mode` runs for genuinely non-deterministic agent behavior --
+since each surfaces things the other cannot.
 
 ## What you may not do
 
@@ -421,6 +455,7 @@ adop_2026/
       tasks/synthetic_tasks.json  # fixed synthetic task set
     scripts/
       live_mode.py                # primary entrypoint
+      interactive_mode.py         # live-demo CLI, ad hoc instructions
       generate_corpus.py          # produces the reference corpus
       reset_testbed.py
       seed_testbed_repo.py
